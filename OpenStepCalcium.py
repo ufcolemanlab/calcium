@@ -263,7 +263,7 @@ def plotHeatAvgs(data, datakeys, stimonset, minheat, maxheat, plottitle):
     plt.axis('tight')
     
     
-def get_response(response_avgs, pregray1s_response_avgs, pre_response_post_avgs, stimwindow, pthresh, togglePlot):
+def get_responseClass(response_avgs, pregray1s_response_avgs, pre_response_post_avgs, stimwindow, pthresh, togglePlot):
     response_indices = dict()
     for cell in response_avgs:
         tempstim = response_avgs[cell]
