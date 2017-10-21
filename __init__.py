@@ -8,8 +8,6 @@ Created on Mon Feb 06 07:43:50 2017
 
 These modules are to be used with Coleman lab "calcium imaging scripts".
 
-Dependencies:
-dill
 
 """
 __author__ = "Coleman Lab <colemanlabuf@gmail.com>"

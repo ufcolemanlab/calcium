@@ -316,7 +316,24 @@ def load_responses(filedir, picklefilename):
     
     return a,b
             
-        # now use to classify each cell - 1) responsive? 2) preference? 3) potentiated or depressed?
+    # now use to classify each cell - 1) responsive? 2) preference?
+    #   3) potentiated or depressed?
+
+
+def load_spontaneous(filedir, picklefilename):
+    
+    """
+    loads data from the first X sec prior to first stimulus onset (gray screen)
+    """
+
+    # D2 Z1
+    with open(filedir+picklefilename) as f:  # Python 3: open(..., 'rb')
+        all = pickle.load(f)
+    a = all['spontaneous_raw']
+    b = all['spontaneous_dff']
+    
+    return a,b
+    
 
 def plot_time_responses(t1_data, t1_indices, t2_data, t2_indices, plotall):
     
