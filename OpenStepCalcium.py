@@ -86,30 +86,58 @@ def get_ori_responses(data):
 # Check DeltaF/F
 # Plot all traces (whole)
 # tracePlot(dff_ewma,)
-def tracePlot(data, response_indices, grays_indices):
+def tracePlot(data, response_indices, grays_indices, plotevents, datatype):
+    '''
+    Plots data for entire imaging session    
     
-    stim_onsetframes, grays_onsetframes = getOnsetIndices(response_indices, grays_indices)
+    data -> list of Numpy arrays (each cell/roi is in a list; data in a vector)
+            e.g., data[0] contains a Numpy array/vector of data for cell# 0
+            
+    response_indices -> OrderedDict of indices (frame ranges) for stim data chunks
+            e.g., response_indices[cell][orientation]
+            
+    grays_indices -> OrderedDict of indices (frame ranges) for gray data chunks
+            e.g., grays_indices[cell][orientation]
+            
+    plotevents -> 'True' to plot lines marking events or 'False' to not
+            
+    datatype -> string, adjust spacing/steps between traces for 'raw' or 'dFoF' data
+            e.g., 'raw' will use a multiplier suitable for values in the 100-500 range
+            
+    Notes: Need to add variable arguments option for function
+    '''
+
     
     plt.subplots()
 
     rangeX = len(data)
     
-
-    for i in range(rangeX):
-
-        plt.plot(data[i]+i)
+    if datatype is 'dFoF':
+        
+        for i in range(rangeX):
+    
+            plt.plot(data[i]+i)
+            
+    elif datatype is 'raw':
+        
+            for i in range(rangeX):
+    
+                plt.plot(data[i]+i*1000)
         
         
     # plot estimated stim onsets
-    for i in range(len(stim_onsetframes)):
+    if plotevents is True:
+        stim_onsetframes, grays_onsetframes = getOnsetIndices(response_indices, grays_indices)        
     
-        plt.axvline(stim_onsetframes[i][0], color = 'g')
-    
-        plt.axvline(stim_onsetframes[i][1], color = 'k')
-    
-        #plt.axvline(grays_onsetframes[i][0], color = 'b')
-    
-        #plt.axvline(grays_onsetframes[i][1], color = 'r')
+        for i in range(len(stim_onsetframes)):
+        
+            plt.axvline(stim_onsetframes[i][0], color = 'g')
+        
+            plt.axvline(stim_onsetframes[i][1], color = 'k')
+        
+            #plt.axvline(grays_onsetframes[i][0], color = 'b')
+        
+            #plt.axvline(grays_onsetframes[i][1], color = 'r')
 
 
 # Plot all orientation response means or pre-stim gray, etc. on one plot
