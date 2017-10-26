@@ -22,11 +22,12 @@ from matplotlib import pyplot as plt
 
 import matplotlib.image as mpimg
 
+import pickle
+
+
 import readroi as roizip
 
 from collections import OrderedDict
-
-import pickle
 
 
 def getOnsetIndices(indices1, indices2):
@@ -338,9 +339,9 @@ def load_responses(filedir, picklefilename):
 
     # D2 Z1
     with open(filedir+picklefilename) as f:  # Python 3: open(..., 'rb')
-        all = pickle.load(f)
-    a = all['responses_means']
-    b = all['all_response_indices']
+        alldata = pickle.load(f)
+    a = alldata['responses_means']
+    b = alldata['all_response_indices']
     
     return a,b
             
@@ -356,9 +357,23 @@ def load_spontaneous(filedir, picklefilename):
 
     # D2 Z1
     with open(filedir+picklefilename) as f:  # Python 3: open(..., 'rb')
-        all = pickle.load(f)
-    a = all['spontaneous_raw']
-    b = all['spontaneous_dff']
+        alldata = pickle.load(f)
+    a = alldata['grayraw_frames']
+    b = alldata['graydff_frames']
+    
+    return a,b
+    
+def load_roixy(filedir, picklefilename):
+    
+    """
+    loads masks and roi-centroid data (x,y)
+    """
+
+    # D2 Z1
+    with open(filedir+picklefilename) as f:  # Python 3: open(..., 'rb')
+        alldata = pickle.load(f)
+    a = alldata['grayraw_frames']
+    b = alldata['graydff_frames']
     
     return a,b
     
@@ -420,3 +435,29 @@ def plot_time_responses(t1_data, t1_indices, t2_data, t2_indices, plotall):
     plt.xlim([0, 1.0])
     
     return t1_output_all, t2_output_all
+    
+
+def loadpickle():
+    '''
+    Load specific variables from the pickle file from process_*.py
+    '''
+    
+    #GUI stuff
+    root = tk.Tk()
+    root.withdraw()
+    #directory = tkFileDialog.askdirectory()
+    picklename = tkFileDialog.askopenfilename(filetypes=[
+        ('Pickle files', '*.pickle'), ('', '*.pkl')])
+    
+    filedir = os.path.split(picklename)[0] + '/'
+    picklefile = os.path.split(picklename)[1]
+    
+    response_means, response_indices  = (
+        load_responses(filedir, picklefile)
+    )
+    
+    spontaneousraw, spontaneousdff = (
+        load_spontaneous(filedir, picklefile)
+    )
+    
+    return response_means, response_indices, spontaneousraw, spontaneousdff
