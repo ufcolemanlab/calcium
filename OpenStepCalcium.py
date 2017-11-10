@@ -6,15 +6,19 @@ Created on Mon Feb 06 07:43:50 2017
 
 @author: Jesse Trinity, Jason Coleman
 
-Last used: 9-9-17
+Last used: 11-9-17
 
 """
 
+import Tkinter as tk
+
+import tkFileDialog
+
+from glob import glob
+
 import numpy as np
 
-from scipy import signal
-
-from scipy.signal import butter, lfilter, freqz
+from scipy.signal import butter, lfilter
 
 import scipy.stats as stats
 
@@ -22,7 +26,11 @@ from matplotlib import pyplot as plt
 
 import matplotlib.image as mpimg
 
+import os
+
 import pickle
+
+from sys import platform
 
 
 import readroi as roizip
@@ -185,7 +193,7 @@ def multiPlot(avgdata,nrows, ncols, celllist, yaxlimit, window, responseindex):
 
     for cellnum in range(nrows):
 
-        tempavg=avgdata[cellnum]
+        tempavg=tempavg=avgdata[celllist[cellnum]]
         
         axisID = -1 # count which column
             
@@ -211,9 +219,9 @@ def multiPlot(avgdata,nrows, ncols, celllist, yaxlimit, window, responseindex):
             
 
 
-def plotStack(imgdir, imgname, roizipname, responses_i):
+def plotStack(imgname, roizipname, responses_i):
 
-    img = mpimg.imread(imgdir+imgname)
+    img = mpimg.imread(imgname)
 
     plt.subplots()
 
@@ -225,7 +233,7 @@ def plotStack(imgdir, imgname, roizipname, responses_i):
 
     #you will need readroi.py file (on GitHub)
 
-    a=roizip.read_roi_zip(imgdir + roizipname)
+    a=roizip.read_roi_zip(roizipname)
     
     # find repsonsive cell (binary)
     c=list()
@@ -292,7 +300,7 @@ def plotHeatAvgs(data, datakeys, stimonset, minheat, maxheat, plottitle):
     plt.axis('tight')
     
     
-def get_responseClass(response_avgs, pregray1s_response_avgs, pre_response_post_avgs, stimwindow, pthresh, togglePlot):
+def get_responseClass(response_avgs, pregray1s_response_avgs, pre_response_post_avgs, stimwindow, pthresh, dffthresh, togglePlot):
     response_indices = dict()
     for cell in response_avgs:
         tempstim = response_avgs[cell]
@@ -306,16 +314,16 @@ def get_responseClass(response_avgs, pregray1s_response_avgs, pre_response_post_
             
             fstat,pval = stats.mannwhitneyu(tempstim[ori][0:stimwindow], tempgray[ori])
             
-            if (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) > 0.1):
+            if (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) > dffthresh):
                 print "Response in cell "+str(cell)+" for "+str(ori)+"deg"+" p="+str(pval)
                 response_indices[cell][ori].append(1.0)
-            elif (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) < -0.1):
+            elif (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) < -dffthresh):
                 print "Depression in cell "+str(cell)+" for "+str(ori)+"deg"+" p="+str(pval)
-                response_indices[cell][ori].append(-1.0)
-            elif ((pval > pthresh or pval < pthresh) and np.mean(tempstim[ori][0:stimwindow]) <= 0.1):
+                response_indices[cell][ori].append(-dffthresh)
+            elif ((pval > pthresh or pval < pthresh) and np.mean(tempstim[ori][0:stimwindow]) <= dffthresh):
                 print "NO response in cell "+str(cell)+" for "+str(ori)+"deg"
                 response_indices[cell][ori].append(0)
-            elif ((pval > pthresh or pval < pthresh) and np.mean(tempstim[ori][0:stimwindow]) >= -0.1):
+            elif ((pval > pthresh or pval < pthresh) and np.mean(tempstim[ori][0:stimwindow]) >= -dffthresh):
                 print "NO response in cell "+str(cell)+" for "+str(ori)+"deg"
                 response_indices[cell][ori].append(0)
                 
@@ -325,9 +333,9 @@ def get_responseClass(response_avgs, pregray1s_response_avgs, pre_response_post_
                 #plt.legend(str(ori))
                 plt.plot(30, np.mean(tempgray[ori]), 'ko')
                 plt.plot(100, np.mean(tempstim[ori][0:stimwindow]), 'bo')
-                if (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) > 0.1):
+                if (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) > dffthresh):
                     plt.title('YES+|Cell#'+str(cell)+'; ori='+str(ori)+'deg'+'; p='+str(pval))
-                elif (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) < -0.1):
+                elif (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) < -dffthresh):
                     plt.title('YES-|Cell#'+str(cell)+'; ori='+str(ori)+'deg'+'; p='+str(pval))
                 else:
                     plt.title('NO|Cell#'+str(cell)+'; ori='+str(ori)+'deg'+'; p='+str(pval))
@@ -376,6 +384,29 @@ def load_roixy(filedir, picklefilename):
     b = alldata['graydff_frames']
     
     return a,b
+
+
+def load_datafiles():
+    
+    root = tk.Tk()
+    root.withdraw()
+    root.update()
+    directory = tkFileDialog.askdirectory(parent=root,title='Choose directory with *.BIN, DATA_*.CSV, STD_*.tif, and ROI_*.zip files ...')
+    
+    #Setup file lists
+    timeStampBINname = str(directory) +"/*.bin"
+    dataCSVname = str(directory) +"/*.csv"
+    stdTIFname = str(directory) +"/*.tif"
+    roiZIPname = str(directory) +"/*.zip"
+    
+    timestampList = glob(timeStampBINname)
+    dataList = glob(dataCSVname)
+    stdList = glob(stdTIFname)
+    roiList = glob(roiZIPname)
+    
+    #timestampList.sort()
+        
+    return timestampList, dataList, stdList, roiList
     
 
 def plot_time_responses(t1_data, t1_indices, t2_data, t2_indices, plotall):
@@ -461,3 +492,64 @@ def loadpickle():
     )
     
     return response_means, response_indices, spontaneousraw, spontaneousdff
+    
+    
+def get_cellCentroids(roizipfile, plotcheck):
+    
+    """
+    Function to get xy centroid points (or close).
+    Note that "plot check" is inverted relative to image/ROI map.
+    """
+
+    a=roizip.read_roi_zip(roizipfile)
+    
+    xlist = []
+    ylist = []
+    
+    xcent = []
+    ycent = []
+    
+    for j in range(len(a)):
+            
+        #print a[j]
+        #print type(a[j])
+        
+        if platform == "linux" or platform == "linux2":
+            # linux
+            xlist = [a[j][i][1] for i in range(len(a[j]))]
+            ylist = [a[j][i][0] for i in range(len(a[j]))]
+            
+        elif platform == "darwin":
+            # OS X
+            xlist = [a[j][1][i][1] for i in range(len(a[j][1]))]
+            ylist = [a[j][1][i][0] for i in range(len(a[j][1]))]
+            
+        elif platform == "win32":
+            # Windows...
+            xlist = [a[j][i][1] for i in range(len(a[j]))]
+            ylist = [a[j][i][0] for i in range(len(a[j]))]
+        
+        # get centroid x,y vals (means)    
+        bx = np.mean(xlist)
+        by = np.mean(ylist)
+        
+        xcent.append(bx)
+        ycent.append(by)    
+            
+        xlist.append(xlist[0])
+        ylist.append(ylist[0])
+        
+        if plotcheck == 1:
+            
+            # note that plt will be inverted relative to image, but correct CELL#s
+        
+            plt.plot(xlist, ylist, '-')
+    
+            plt.annotate(str(j), xy=(1, 1), xytext = (xlist[i], ylist[i]), color='limegreen', fontsize=8)
+                   
+            plt.plot(xcent, ycent, 'o')
+            
+            plt.xlim([0,512])            
+            plt.ylim([0,512])
+    
+    return xcent, ycent 

@@ -195,6 +195,7 @@ class FileHandler():
         xcoords = list()
         ycoords = list()
         for i in range(len(c[0])):
+            # String keys from FIJI
             if 'RawIntDen' in c[0][i]:
                 cellsraw.append(np.array(c[1:, i]).astype(np.float64))
             if 'Mean' in c[0][i]:
@@ -205,6 +206,12 @@ class FileHandler():
                 xcoords.append(np.array(c[1:, i]).astype(np.float64))
             if 'Y' in c[0][i]:
                 ycoords.append(np.array(c[1:, i]).astype(np.float64))
+                
+        if len(cellsmean) == 0:
+            print ('no Mean column, manually computing mean intensity')
+            for roi in range(len(cellsraw)):                    
+                cellsmean.append(cellsraw[roi]/areas[roi])
+            
         return cellsraw, cellsmean, areas, xcoords, ycoords
     
     def get_cells_from_smoothed(self, c):
