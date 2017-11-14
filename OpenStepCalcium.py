@@ -343,15 +343,20 @@ def get_responseClass(response_avgs, pregray1s_response_avgs, pre_response_post_
     return response_indices
     
 
-def load_responses(filedir, picklefilename):
+def load_responses():
+    
+    root = tk.Tk()
+    root.withdraw()
+    root.update()
+    
+    filepath = tkFileDialog.askopenfilename(parent=root,title='Choose a pickle file ...')
 
-    # D2 Z1
-    with open(filedir+picklefilename) as f:  # Python 3: open(..., 'rb')
+    with open(filepath) as f:  # Python 3: open(..., 'rb')
         alldata = pickle.load(f)
     a = alldata['responses_means']
     b = alldata['all_response_indices']
     
-    return a,b
+    return a, b
             
     # now use to classify each cell - 1) responsive? 2) preference?
     #   3) potentiated or depressed?
@@ -391,7 +396,9 @@ def load_datafiles():
     root = tk.Tk()
     root.withdraw()
     root.update()
-    directory = tkFileDialog.askdirectory(parent=root,title='Choose directory with *.BIN, DATA_*.CSV, STD_*.tif, and ROI_*.zip files ...')
+    
+    directory = tkFileDialog.askdirectory(parent=root,title=
+        'Choose directory with *.BIN, DATA_*.CSV, STD_*.tif, and ROI_*.zip files ...')
     
     #Setup file lists
     timeStampBINname = str(directory) +"/*.bin"
