@@ -1,9 +1,8 @@
 # calcium
 Coleman lab calcium image analysis library for Python.
 
-Use for data acquired on the Thorlabs-Bscope from 2012-2019
+Use for data acquired on the Thorlabs-Bscope from 2012-2019.
 
-To use:
 Add to working Python packages folder by:
 
 1) Copy 'calcium' folder to your Python packages path: /Users/jcoleman/opt/anaconda3/pkgs/calcium
