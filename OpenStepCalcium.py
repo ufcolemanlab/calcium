@@ -7,12 +7,14 @@ Created on Mon Feb 06 07:43:50 2017
 @author: Jesse Trinity, Jason Coleman
 
 Last used: 11-9-17
+Updated for Python 3.9: 03-22-24
 
 """
 
-import Tkinter as tk
+import tkinter as tk
 
-import tkFileDialog
+#import tkFileDialog
+from tkinter import filedialog as tkFileDialog
 
 from glob import glob
 
@@ -121,13 +123,13 @@ def tracePlot(data, response_indices, grays_indices, plotevents, datatype):
 
     rangeX = len(data)
     
-    if datatype is 'dFoF':
+    if datatype == 'dFoF':
         
         for i in range(rangeX):
     
             plt.plot(data[i]+i)
             
-    elif datatype is 'raw':
+    elif datatype == 'raw':
         
             for i in range(rangeX):
     
@@ -245,7 +247,7 @@ def plotStack(imgname, roizipname, responses_i):
             elif responses_i[cell][ori][0] != 1:
                 b.append(0)
         if sum(b) > 0:
-            print cell
+            print (cell)
             c.append(1)
         elif sum(b) == 0 or sum(b) < 0:
             c.append(0)
@@ -275,11 +277,13 @@ def plotStack(imgname, roizipname, responses_i):
         
         if c[j] > 0: # if cell is responsive (see loop above)
 
-            plt.annotate(str(j), xy=(1, 1), xytext=(xlist[i], ylist[i]), color='limegreen', fontsize=8)
+            # plt.annotate(str(j), xy=(1, 1), xytext=(xlist[i], ylist[i]), color='limegreen', fontsize=8)
+            plt.annotate(str(j), xy=(1, 1), xytext=(xlist[j], ylist[j]), color='limegreen', fontsize=8)
         
         elif c[j] <= 0: # if cell is NOT responsive (see loop above)
 
-            plt.annotate(str(j), xy=(1, 1), xytext=(xlist[i], ylist[i]), color='red', fontsize=8)
+            # plt.annotate(str(j), xy=(1, 1), xytext=(xlist[i], ylist[i]), color='red', fontsize=8)
+            plt.annotate(str(j), xy=(1, 1), xytext=(xlist[j], ylist[j]), color='red', fontsize=8)
         
 
 def get_colormaps(delta_f, keys, minimum, maximum):
@@ -315,16 +319,16 @@ def get_responseClass(response_avgs, pregray1s_response_avgs, pre_response_post_
             fstat,pval = stats.mannwhitneyu(tempstim[ori][0:stimwindow], tempgray[ori])
             
             if (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) > dffthresh):
-                print "Response in cell "+str(cell)+" for "+str(ori)+"deg"+" p="+str(pval)
+                print ("Response in cell "+str(cell)+" for "+str(ori)+"deg"+" p="+str(pval))
                 response_indices[cell][ori].append(1.0)
             elif (pval < pthresh and np.mean(tempstim[ori][0:stimwindow]) < -dffthresh):
-                print "Depression in cell "+str(cell)+" for "+str(ori)+"deg"+" p="+str(pval)
+                print ("Depression in cell "+str(cell)+" for "+str(ori)+"deg"+" p="+str(pval))
                 response_indices[cell][ori].append(-dffthresh)
             elif ((pval > pthresh or pval < pthresh) and np.mean(tempstim[ori][0:stimwindow]) <= dffthresh):
-                print "NO response in cell "+str(cell)+" for "+str(ori)+"deg"
+                print ("NO response in cell "+str(cell)+" for "+str(ori)+"deg")
                 response_indices[cell][ori].append(0)
             elif ((pval > pthresh or pval < pthresh) and np.mean(tempstim[ori][0:stimwindow]) >= -dffthresh):
-                print "NO response in cell "+str(cell)+" for "+str(ori)+"deg"
+                print ("NO response in cell "+str(cell)+" for "+str(ori)+"deg")
                 response_indices[cell][ori].append(0)
                 
             if togglePlot == 1:
@@ -552,7 +556,8 @@ def get_cellCentroids(roizipfile, plotcheck):
         
             plt.plot(xlist, ylist, '-')
     
-            plt.annotate(str(j), xy=(1, 1), xytext = (xlist[i], ylist[i]), color='limegreen', fontsize=8)
+            # ? plt.annotate(str(j), xy=(1, 1), xytext = (xlist[i], ylist[i]), color='limegreen', fontsize=8)
+            plt.annotate(str(j), xy=(1, 1), xytext = (xlist[j], ylist[j]), color='limegreen', fontsize=8)
                    
             plt.plot(xcent, ycent, 'o')
             
