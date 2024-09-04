@@ -1,6 +1,6 @@
 def smoothed_z (z, L):
     """
-    Computes the exponentially weighted moving average (with memory L) of input data z.
+    Computes the exponentially weighted moving average (EWMA, with memory L) of input data z.
     Ported from original MATLAB function to Python by Z. Royston (Coleman lab):
     
     z is an input vector/1D array
